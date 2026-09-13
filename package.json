@@ -29,7 +29,7 @@
     "web": "expo start --web",
     "build:web": "expo export -p web",
     "predeploy": "npm run build:web",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist --nojekyll -t"
   },
   "private": true
 }
