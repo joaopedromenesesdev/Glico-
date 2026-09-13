@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    
     <title>Glico+</title>
     <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
     <style id="expo-reset">
@@ -23,7 +23,36 @@
         flex: 1;
       }
     </style>
-  <link rel="icon" href="/Glico-/favicon.ico"/></head>
+  <link rel="icon" href="/Glico-/favicon.ico"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Glico+" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <meta name="theme-color" content="#FFFFFF" />
+    <style id="glico-native-mobile-styles">
+      @font-face {
+        font-family: 'Ionicons';
+        src: url('./fonts/Ionicons.ttf') format('truetype'),
+             url('https://cdn.jsdelivr.net/npm/@expo/vector-icons@15.0.2/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf') format('truetype');
+        font-display: swap;
+      }
+      html, body {
+        height: 100%;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      #root {
+        min-height: 100%;
+        min-height: -webkit-fill-available;
+      }
+    </style>
+  
+</head>
 
   <body>
     <!-- Use static rendering with Expo Router to support running without JavaScript. -->
@@ -32,6 +61,6 @@
     </noscript>
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
-  <script src="/Glico-/_expo/static/js/web/index-e67bd3f825f42c4dd3dd19d1979e5d85.js" defer></script>
+  <script src="/Glico-/_expo/static/js/web/index-9c3440351533b265baae8b46ee91c9c0.js" defer></script>
 </body>
 </html>
