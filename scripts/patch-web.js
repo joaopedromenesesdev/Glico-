@@ -52,9 +52,33 @@ if (fs.existsSync(faviconSrc)) {
   console.log('✓ favicon.png copiado para dist');
 }
 
-// 4. Injetar @font-face e meta tags de otimização para iPhone no index.html
+// 4. Injetar fonte Ionicons (base64 embutida para carregamento 100% garantido e sem falha de rede/CORS) e meta tags
 if (fs.existsSync(indexPath)) {
   let html = fs.readFileSync(indexPath, 'utf8');
+
+  let fontFacesCss = '';
+  if (fs.existsSync(ioniconsSrc)) {
+    const ttfBuffer = fs.readFileSync(ioniconsSrc);
+    const ttfBase64 = ttfBuffer.toString('base64');
+    fontFacesCss = `
+      @font-face {
+        font-family: 'ionicons';
+        src: url('data:font/truetype;charset=utf-8;base64,${ttfBase64}') format('truetype'),
+             url('./fonts/Ionicons.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Ionicons';
+        src: url('data:font/truetype;charset=utf-8;base64,${ttfBase64}') format('truetype'),
+             url('./fonts/Ionicons.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: block;
+      }
+    `;
+  }
 
   // Adicionar meta tags para iPhone / PWA
   const mobileMeta = `
@@ -62,16 +86,11 @@ if (fs.existsSync(indexPath)) {
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Glico+" />
-    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
-    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="./favicon.png" />
     <meta name="theme-color" content="#FFFFFF" />
     <style id="glico-native-mobile-styles">
-      @font-face {
-        font-family: 'Ionicons';
-        src: url('./fonts/Ionicons.ttf') format('truetype'),
-             url('https://cdn.jsdelivr.net/npm/@expo/vector-icons@15.0.2/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf') format('truetype');
-        font-display: swap;
-      }
+      ${fontFacesCss}
       html, body {
         height: 100%;
         overflow-x: hidden;
@@ -79,6 +98,7 @@ if (fs.existsSync(indexPath)) {
         -webkit-touch-callout: none;
         user-select: none;
         -webkit-user-select: none;
+        background-color: #FFFFFF;
       }
       #root {
         min-height: 100%;

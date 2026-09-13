@@ -46,14 +46,14 @@ export const ContextChip: React.FC<ContextChipProps> = ({
 
 const styles = StyleSheet.create({
   chip: {
+    width: '48.5%',
     height: 48,
-    borderRadius: THEME.sizing.borderRadiusPill,
-    paddingHorizontal: 16,
+    borderRadius: 14,
+    paddingHorizontal: 6,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
-    marginBottom: 10,
+    marginBottom: 8,
     borderWidth: 1.5,
   },
   chipSelected: {
@@ -61,17 +61,17 @@ const styles = StyleSheet.create({
     borderColor: THEME.colors.primary,
     shadowColor: THEME.colors.primary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
   },
   chipUnselected: {
     backgroundColor: '#FFFFFF',
     borderColor: THEME.colors.border,
   },
   text: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
   },
   textSelected: {
     color: '#FFFFFF',

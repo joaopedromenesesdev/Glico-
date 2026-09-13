@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   formCard: {
     backgroundColor: THEME.colors.surface,
     borderRadius: THEME.sizing.borderRadiusCard,
-    padding: THEME.spacing.lg,
+    padding: 16,
     borderWidth: 1,
     borderColor: THEME.colors.border,
   },
@@ -403,16 +403,17 @@ const styles = StyleSheet.create({
   chipsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'space-between',
     marginTop: 10,
   },
   notesToggle: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
-    paddingVertical: 8,
+    marginTop: 10,
+    paddingVertical: 4,
   },
   notesToggleText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: THEME.colors.primary,
     marginLeft: 6,
@@ -428,6 +429,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   buttonWrapper: {
-    marginTop: THEME.spacing.xl,
+    marginTop: 16,
   },
 });

@@ -8,6 +8,7 @@ import {
   StatusBar,
   ActivityIndicator,
   Platform,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BloodGlucoseMeasurement } from './src/domain/entities/GlucoseMeasurement';
@@ -120,24 +121,29 @@ export default function App() {
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       <View style={styles.mobileContainer}>
-        {/* Cabeçalho do Aplicativo */}
+        {/* Cabeçalho do Aplicativo com Logo G+ Real */}
         <View style={styles.appHeader}>
           <View style={styles.brandRow}>
-            <View style={styles.logoIconBg}>
-              <Ionicons name="water" size={22} color="#FFFFFF" />
-            </View>
-            <View>
-              <Text style={styles.appTitle}>Glico+</Text>
-              <Text style={styles.appSubtitle}>Acompanhamento Pessoal de Saúde</Text>
+            <Image
+              source={require('./assets/G+.png')}
+              style={styles.headerLogoImage}
+              resizeMode="contain"
+            />
+            <View style={styles.brandTextCol}>
+              <View style={styles.brandTitleRow}>
+                <Text style={styles.appTitle}>Glico+</Text>
+                {medicalProfile && medicalProfile.isActive && (
+                  <View style={styles.headerMedicalTag}>
+                    <Ionicons name="shield-checkmark" size={12} color="#065F46" />
+                    <Text style={styles.headerMedicalTagText}>Plano Ativo</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.appSubtitle} numberOfLines={1}>
+                Acompanhamento de Glicemia
+              </Text>
             </View>
           </View>
-
-          {medicalProfile && medicalProfile.isActive && (
-            <View style={styles.headerMedicalTag}>
-              <Ionicons name="shield-checkmark" size={14} color="#065F46" />
-              <Text style={styles.headerMedicalTagText}>Regra Médica Ativa</Text>
-            </View>
-          )}
         </View>
 
         {/* Conteúdo da Tela Ativa */}
@@ -294,43 +300,49 @@ const styles = StyleSheet.create({
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
-  logoIconBg: {
-    width: 38,
-    height: 38,
+  headerLogoImage: {
+    width: 42,
+    height: 42,
     borderRadius: 12,
-    backgroundColor: THEME.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    backgroundColor: '#FFFFFF',
     marginRight: 10,
-    shadowColor: THEME.colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 3,
+  },
+  brandTextCol: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  brandTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   appTitle: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '800',
     color: THEME.colors.textPrimary,
   },
   appSubtitle: {
     fontSize: 12,
     color: THEME.colors.textMuted,
+    marginTop: 1,
   },
   headerMedicalTag: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#D1FAE5',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 10,
+    marginLeft: 8,
   },
   headerMedicalTagText: {
     fontSize: 11,
     fontWeight: '700',
     color: '#065F46',
-    marginLeft: 4,
+    marginLeft: 3,
   },
   screenContainer: {
     flex: 1,
