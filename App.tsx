@@ -260,7 +260,7 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Platform.OS === 'web' ? '#F8FAFC' : '#FFFFFF',
+    backgroundColor: '#FFFFFF',
   },
   mobileContainer: {
     flex: 1,
@@ -268,17 +268,6 @@ const styles = StyleSheet.create({
     maxWidth: 480,
     alignSelf: 'center',
     backgroundColor: '#FFFFFF',
-    ...(Platform.OS === 'web'
-      ? {
-          shadowColor: '#0F172A',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.08,
-          shadowRadius: 16,
-          borderLeftWidth: 1,
-          borderRightWidth: 1,
-          borderColor: '#E2E8F0',
-        }
-      : {}),
   },
   loadingContainer: {
     flex: 1,
@@ -349,13 +338,13 @@ const styles = StyleSheet.create({
   },
   bottomNav: {
     flexDirection: 'row',
-    height: 68,
+    height: 76,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: THEME.colors.border,
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingBottom: Platform.OS === 'ios' ? 12 : 6,
+    paddingBottom: 16,
   },
   navTab: {
     flex: 1,
