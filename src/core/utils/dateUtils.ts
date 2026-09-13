@@ -48,3 +48,41 @@ export function getRelativeTimeLabel(isoString: string): string {
 
   return formatDateTime(isoString);
 }
+
+export function getCurrentTimeFormatted(date = new Date()): string {
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+export function isValidTime(timeStr: string): boolean {
+  if (!timeStr || typeof timeStr !== 'string') return false;
+  const parts = timeStr.split(':');
+  if (parts.length !== 2) return false;
+  if (parts[0].length !== 2 || parts[1].length !== 2) return false;
+  const h = Number(parts[0]);
+  const m = Number(parts[1]);
+  return !isNaN(h) && !isNaN(m) && h >= 0 && h <= 23 && m >= 0 && m <= 59;
+}
+
+export function subtractMinutesFromNow(minutes: number, baseDate = new Date()): string {
+  const target = new Date(baseDate.getTime() - minutes * 60 * 1000);
+  return getCurrentTimeFormatted(target);
+}
+
+export function createIsoFromTime(timeStr: string, baseDate = new Date()): string {
+  const parts = timeStr.split(':');
+  const h = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+
+  const d = new Date(baseDate);
+  if (!isNaN(h) && !isNaN(m) && h >= 0 && h <= 23 && m >= 0 && m <= 59) {
+    d.setHours(h, m, 0, 0);
+    // Se o horário especificado for da noite (>= 18h) e a data/hora base for de manhã (< 12h),
+    // e cair no futuro em relação à data base, consideramos que se refere à medição da noite anterior
+    if (d.getTime() > baseDate.getTime() && baseDate.getHours() < 12 && h >= 18) {
+      d.setDate(d.getDate() - 1);
+    }
+  }
+  return d.toISOString();
+}

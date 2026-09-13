@@ -23,7 +23,14 @@ import { ContextChip } from '../components/ContextChip';
 import { BigButton } from '../components/BigButton';
 import { GlucoseBadge } from '../components/GlucoseBadge';
 import { InsulinCard } from '../components/InsulinCard';
-import { formatTimeShort, getRelativeTimeLabel } from '../../core/utils/dateUtils';
+import {
+  formatTimeShort,
+  getRelativeTimeLabel,
+  getCurrentTimeFormatted,
+  isValidTime,
+  subtractMinutesFromNow,
+  createIsoFromTime,
+} from '../../core/utils/dateUtils';
 
 interface RegisterScreenProps {
   lastMeasurement: BloodGlucoseMeasurement | null;
@@ -44,11 +51,64 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
 }) => {
   const [glucoseStr, setGlucoseStr] = useState<string>('');
   const [selectedContext, setSelectedContext] = useState<MeasurementContext>('fasting');
+  const [measurementTime, setMeasurementTime] = useState<string>(() => getCurrentTimeFormatted());
   const [notes, setNotes] = useState<string>('');
   const [showNotes, setShowNotes] = useState<boolean>(false);
   const [appliedInsulin, setAppliedInsulin] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleTimeChange = (text: string) => {
+    const clean = text.replace(/[^0-9]/g, '');
+    if (clean.length === 0) {
+      setMeasurementTime('');
+      return;
+    }
+    if (clean.length <= 2) {
+      setMeasurementTime(clean);
+      return;
+    }
+    const hh = clean.slice(0, 2);
+    const mm = clean.slice(2, 4);
+    setMeasurementTime(`${hh}:${mm}`);
+  };
+
+  const handleTimeBlur = () => {
+    if (!measurementTime.trim()) {
+      setMeasurementTime(getCurrentTimeFormatted());
+      return;
+    }
+    const clean = measurementTime.replace(/[^0-9]/g, '');
+    let h = 0;
+    let m = 0;
+    if (clean.length === 1 || clean.length === 2) {
+      h = parseInt(clean, 10);
+      m = 0;
+    } else if (clean.length === 3) {
+      h = parseInt(clean.slice(0, 1), 10);
+      m = parseInt(clean.slice(1, 3), 10);
+    } else if (clean.length >= 4) {
+      h = parseInt(clean.slice(0, 2), 10);
+      m = parseInt(clean.slice(2, 4), 10);
+    }
+
+    if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) {
+      const msg = 'Horário inválido. Por favor, digite um horário entre 00:00 e 23:59.';
+      Platform.OS === 'web' ? window.alert(msg) : Alert.alert('Atenção', msg);
+      setMeasurementTime(getCurrentTimeFormatted());
+      return;
+    }
+
+    setMeasurementTime(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+  };
+
+  const handleSetTimeToNow = () => {
+    setMeasurementTime(getCurrentTimeFormatted());
+  };
+
+  const handleSubtractMinutes = (mins: number) => {
+    setMeasurementTime(subtractMinutesFromNow(mins));
+  };
 
   const glucoseValue = useMemo(() => {
     const parsed = parseInt(glucoseStr, 10);
@@ -86,11 +146,18 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
       return;
     }
 
+    if (!isValidTime(measurementTime)) {
+      const msg = 'Por favor, informe um horário válido no formato HH:MM (ex: 14:30).';
+      Platform.OS === 'web' ? window.alert(msg) : Alert.alert('Atenção', msg);
+      return;
+    }
+
     try {
       setIsSaving(true);
+      const measuredAt = createIsoFromTime(measurementTime);
       await onSaveMeasurement({
         value: glucoseValue,
-        measuredAt: new Date().toISOString(),
+        measuredAt,
         context: selectedContext,
         notes: notes.trim() || undefined,
         calculatedInsulinDose: insulinResult.calculatedUnits ?? undefined,
@@ -103,6 +170,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
       setNotes('');
       setShowNotes(false);
       setAppliedInsulin(null);
+      setMeasurementTime(getCurrentTimeFormatted());
       setSuccessMessage(`Medição de ${glucoseValue} mg/dL salva com sucesso!`);
       setTimeout(() => setSuccessMessage(null), 3500);
     } catch (error) {
@@ -205,6 +273,82 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
               onSelect={setSelectedContext}
             />
           ))}
+        </View>
+
+        {/* Input de Horário da Medição */}
+        <View style={styles.timeSection}>
+          <Text style={[styles.sectionTitle, { marginTop: THEME.spacing.lg }]}>
+            Horário da Medição:
+          </Text>
+          <Text style={styles.sectionSubtitle}>
+            Horário em que o teste foi realizado no aparelho:
+          </Text>
+
+          <View style={styles.timeControlCard}>
+            <View style={styles.timeInputRow}>
+              {/* Caixa de Entrada de Horário */}
+              <View style={styles.timeInputBox}>
+                <Ionicons
+                  name="time-outline"
+                  size={24}
+                  color={THEME.colors.primaryDark}
+                  style={styles.timeIcon}
+                />
+                <TextInput
+                  style={styles.timeInput}
+                  keyboardType="number-pad"
+                  returnKeyType="done"
+                  value={measurementTime}
+                  onChangeText={handleTimeChange}
+                  onBlur={handleTimeBlur}
+                  placeholder="00:00"
+                  placeholderTextColor="#94A3B8"
+                  maxLength={5}
+                  selectTextOnFocus
+                />
+              </View>
+
+              {/* Botão Agora */}
+              <TouchableOpacity
+                style={styles.timeNowBtn}
+                onPress={handleSetTimeToNow}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name="refresh"
+                  size={18}
+                  color={THEME.colors.primaryDark}
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={styles.timeNowBtnText}>Agora</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Presets Rápidos de Horário */}
+            <View style={styles.quickPresetsRow}>
+              <TouchableOpacity
+                style={styles.quickPresetChip}
+                onPress={() => handleSubtractMinutes(15)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.quickPresetText}>-15 min</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.quickPresetChip}
+                onPress={() => handleSubtractMinutes(30)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.quickPresetText}>-30 min</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.quickPresetChip}
+                onPress={() => handleSubtractMinutes(60)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.quickPresetText}>-1 hora</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
         {/* Card Condicional de Insulina Ultrarrápida */}
@@ -405,6 +549,81 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginTop: 10,
+  },
+  timeSection: {
+    marginTop: 4,
+  },
+  timeControlCard: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: THEME.colors.border,
+    padding: 12,
+    marginTop: 4,
+  },
+  timeInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  timeInputBox: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: THEME.colors.border,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    height: 52,
+    marginRight: 10,
+  },
+  timeIcon: {
+    marginRight: 10,
+  },
+  timeInput: {
+    flex: 1,
+    fontSize: 22,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+    letterSpacing: 1,
+  },
+  timeNowBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: THEME.colors.primaryLight,
+    paddingHorizontal: 16,
+    height: 52,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#99F6E4',
+  },
+  timeNowBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: THEME.colors.primaryDark,
+  },
+  quickPresetsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  quickPresetChip: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: THEME.colors.border,
+    borderRadius: 10,
+    paddingVertical: 8,
+    marginHorizontal: 3,
+  },
+  quickPresetText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: THEME.colors.textSecondary,
   },
   notesToggle: {
     flexDirection: 'row',
