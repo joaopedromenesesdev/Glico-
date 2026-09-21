@@ -20,6 +20,7 @@ import {
 import { BloodGlucoseMeasurement } from '../../domain/entities/GlucoseMeasurement';
 import { THEME } from '../theme';
 import { generateDoctorTextReport, generateCsvReport } from '../../core/utils/exportUtils';
+import { generateAndSharePdfReport } from '../../core/utils/pdfReportUtils';
 import { BigButton } from '../components/BigButton';
 
 interface SettingsScreenProps {
@@ -36,6 +37,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   onHardResetData,
 }) => {
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [doctorName, setDoctorName] = useState<string>(medicalProfile?.doctorName || '');
   const [prescriptionDate, setPrescriptionDate] = useState<string>(
     medicalProfile?.prescriptionDate || new Date().toISOString().split('T')[0]
@@ -152,6 +154,24 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       }
     } else {
       Alert.alert('Relatório para o Médico', report);
+    }
+  };
+
+  const handleGeneratePdf = async () => {
+    const active = measurements.filter((m) => !m.isDeleted);
+    if (active.length === 0) {
+      const msg = 'Nenhuma medição registrada para gerar o relatório em PDF.';
+      Platform.OS === 'web' ? window.alert(msg) : Alert.alert('Atenção', msg);
+      return;
+    }
+    try {
+      setIsGeneratingPdf(true);
+      await generateAndSharePdfReport(active, medicalProfile, 'Mamãe');
+    } catch (err) {
+      const msg = 'Não foi possível gerar o relatório em PDF. Tente novamente.';
+      Platform.OS === 'web' ? window.alert(msg) : Alert.alert('Erro', msg);
+    } finally {
+      setIsGeneratingPdf(false);
     }
   };
 
@@ -280,6 +300,18 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         <Text style={styles.sectionDesc}>
           Envie o relatório das medições para seu endocrinologista acompanhar o tratamento:
         </Text>
+
+        <TouchableOpacity
+          style={styles.btnGeneratePdf}
+          onPress={handleGeneratePdf}
+          disabled={isGeneratingPdf}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="document-text" size={22} color="#FFFFFF" style={{ marginRight: 8 }} />
+          <Text style={styles.btnGeneratePdfText}>
+            {isGeneratingPdf ? 'Gerando Relatório PDF...' : '📄 Gerar Relatório Médico em PDF'}
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.btnShareWhatsapp}
@@ -570,6 +602,25 @@ const styles = StyleSheet.create({
   },
   btnPresetText: {
     fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  btnGeneratePdf: {
+    backgroundColor: '#DC2626',
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    marginBottom: 10,
+    shadowColor: '#DC2626',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  btnGeneratePdfText: {
+    fontSize: 15,
     fontWeight: '700',
     color: '#FFFFFF',
   },

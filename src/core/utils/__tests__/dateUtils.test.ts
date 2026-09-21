@@ -77,4 +77,45 @@ describe('dateUtils', () => {
       expect(new Date(iso).getTime()).toBe(base.getTime());
     });
   });
+
+  describe('calendar and retroactive date utilities', () => {
+    it('isSameDay accurately compares dates', () => {
+      const d1 = new Date(2026, 8, 21, 10, 0);
+      const d2 = new Date(2026, 8, 21, 18, 30);
+      const d3 = new Date(2026, 8, 20, 10, 0);
+      const { isSameDay } = require('../dateUtils');
+      expect(isSameDay(d1, d2)).toBe(true);
+      expect(isSameDay(d1, d3)).toBe(false);
+    });
+
+    it('createIsoFromDateAndTime combines date and time properly', () => {
+      const { createIsoFromDateAndTime } = require('../dateUtils');
+      const targetDate = new Date(2026, 8, 15);
+      const iso = createIsoFromDateAndTime(targetDate, '08:45');
+      const parsed = new Date(iso);
+      expect(parsed.getFullYear()).toBe(2026);
+      expect(parsed.getMonth()).toBe(8);
+      expect(parsed.getDate()).toBe(15);
+      expect(parsed.getHours()).toBe(8);
+      expect(parsed.getMinutes()).toBe(45);
+    });
+
+    it('getDaysInMonth returns correct days for months', () => {
+      const { getDaysInMonth } = require('../dateUtils');
+      // Setembro (mês 8 em 0-index) tem 30 dias
+      expect(getDaysInMonth(2026, 8)).toBe(30);
+      // Fevereiro em ano não bissexto (2026) tem 28 dias
+      expect(getDaysInMonth(2026, 1)).toBe(28);
+      // Fevereiro em ano bissexto (2024) tem 29 dias
+      expect(getDaysInMonth(2024, 1)).toBe(29);
+    });
+
+    it('getMonthName returns correct Portuguese month names', () => {
+      const { getMonthName } = require('../dateUtils');
+      expect(getMonthName(0)).toBe('Janeiro');
+      expect(getMonthName(8)).toBe('Setembro');
+      expect(getMonthName(11)).toBe('Dezembro');
+    });
+  });
 });
+

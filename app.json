@@ -23,6 +23,9 @@
     },
     "experiments": {
       "baseUrl": "/Glico-"
-    }
+    },
+    "plugins": [
+      "expo-sharing"
+    ]
   }
 }

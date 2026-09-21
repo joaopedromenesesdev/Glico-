@@ -23,6 +23,7 @@ import { ContextChip } from '../components/ContextChip';
 import { BigButton } from '../components/BigButton';
 import { GlucoseBadge } from '../components/GlucoseBadge';
 import { InsulinCard } from '../components/InsulinCard';
+import { CalendarDatePickerModal } from '../components/CalendarDatePickerModal';
 import {
   formatTimeShort,
   getRelativeTimeLabel,
@@ -30,6 +31,10 @@ import {
   isValidTime,
   subtractMinutesFromNow,
   createIsoFromTime,
+  formatDateDisplay,
+  isToday as isTodayFn,
+  isYesterday as isYesterdayFn,
+  createIsoFromDateAndTime,
 } from '../../core/utils/dateUtils';
 
 interface RegisterScreenProps {
@@ -52,6 +57,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   const [glucoseStr, setGlucoseStr] = useState<string>('');
   const [selectedContext, setSelectedContext] = useState<MeasurementContext>('fasting');
   const [measurementTime, setMeasurementTime] = useState<string>(() => getCurrentTimeFormatted());
+  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [notes, setNotes] = useState<string>('');
   const [showNotes, setShowNotes] = useState<boolean>(false);
   const [appliedInsulin, setAppliedInsulin] = useState<number | null>(null);
@@ -154,7 +161,10 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
 
     try {
       setIsSaving(true);
-      const measuredAt = createIsoFromTime(measurementTime);
+      // Usar a data selecionada no calendário + horário digitado
+      const measuredAt = isTodayFn(selectedDate)
+        ? createIsoFromTime(measurementTime)
+        : createIsoFromDateAndTime(selectedDate, measurementTime);
       await onSaveMeasurement({
         value: glucoseValue,
         measuredAt,
@@ -171,6 +181,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
       setShowNotes(false);
       setAppliedInsulin(null);
       setMeasurementTime(getCurrentTimeFormatted());
+      setSelectedDate(new Date());
       setSuccessMessage(`Medição de ${glucoseValue} mg/dL salva com sucesso!`);
       setTimeout(() => setSuccessMessage(null), 3500);
     } catch (error) {
@@ -273,6 +284,93 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
               onSelect={setSelectedContext}
             />
           ))}
+        </View>
+
+        {/* Seletor de Data da Medição */}
+        <View style={styles.dateSection}>
+          <Text style={[styles.sectionTitle, { marginTop: THEME.spacing.lg }]}>
+            Data da Medição:
+          </Text>
+          <Text style={styles.sectionSubtitle}>
+            Selecione o dia em que o teste foi feito:
+          </Text>
+
+          <View style={styles.dateDisplay}>
+            <Ionicons name="calendar" size={22} color={THEME.colors.primaryDark} style={{ marginRight: 10 }} />
+            <Text style={styles.dateDisplayText}>
+              {formatDateDisplay(selectedDate)}
+            </Text>
+          </View>
+
+          <View style={styles.dateQuickBtnsRow}>
+            <TouchableOpacity
+              style={[
+                styles.dateQuickBtn,
+                isTodayFn(selectedDate) && styles.dateQuickBtnActive,
+              ]}
+              onPress={() => setSelectedDate(new Date())}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.dateQuickBtnText,
+                  isTodayFn(selectedDate) && styles.dateQuickBtnTextActive,
+                ]}
+              >
+                Hoje
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.dateQuickBtn,
+                isYesterdayFn(selectedDate) && styles.dateQuickBtnActive,
+              ]}
+              onPress={() => {
+                const y = new Date();
+                y.setDate(y.getDate() - 1);
+                setSelectedDate(y);
+              }}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.dateQuickBtnText,
+                  isYesterdayFn(selectedDate) && styles.dateQuickBtnTextActive,
+                ]}
+              >
+                Ontem
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.dateQuickBtn,
+                !isTodayFn(selectedDate) && !isYesterdayFn(selectedDate) && styles.dateQuickBtnActive,
+              ]}
+              onPress={() => setShowCalendar(true)}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="calendar-outline"
+                size={16}
+                color={
+                  !isTodayFn(selectedDate) && !isYesterdayFn(selectedDate)
+                    ? '#FFFFFF'
+                    : THEME.colors.textSecondary
+                }
+                style={{ marginRight: 4 }}
+              />
+              <Text
+                style={[
+                  styles.dateQuickBtnText,
+                  !isTodayFn(selectedDate) && !isYesterdayFn(selectedDate) && styles.dateQuickBtnTextActive,
+                ]}
+              >
+                Outro dia...
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Input de Horário da Medição */}
@@ -407,6 +505,14 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
           />
         </View>
       </View>
+
+      {/* Modal de Calendário */}
+      <CalendarDatePickerModal
+        visible={showCalendar}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+        onClose={() => setShowCalendar(false)}
+      />
     </ScrollView>
   );
 };
@@ -549,6 +655,54 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginTop: 10,
+  },
+  dateSection: {
+    marginTop: 4,
+  },
+  dateDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0FDFA',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#99F6E4',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 4,
+    marginBottom: 10,
+  },
+  dateDisplayText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: THEME.colors.primaryDark,
+  },
+  dateQuickBtnsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  dateQuickBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: THEME.colors.border,
+    borderRadius: 12,
+    paddingVertical: 10,
+    marginHorizontal: 3,
+  },
+  dateQuickBtnActive: {
+    backgroundColor: THEME.colors.primary,
+    borderColor: THEME.colors.primary,
+  },
+  dateQuickBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: THEME.colors.textSecondary,
+  },
+  dateQuickBtnTextActive: {
+    color: '#FFFFFF',
   },
   timeSection: {
     marginTop: 4,

@@ -160,6 +160,7 @@ export default function App() {
           {activeTab === 'history' && (
             <HistoryScreen
               measurements={measurements}
+              medicalProfile={medicalProfile}
               onDeleteMeasurement={handleDeleteMeasurement}
               onUpdateMeasurement={handleUpdateMeasurement}
               onNavigateToRegister={() => setActiveTab('register')}

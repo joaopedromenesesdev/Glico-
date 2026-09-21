@@ -16,13 +16,16 @@ import {
   MeasurementContext,
   CONTEXT_LABELS,
 } from '../../domain/entities/GlucoseMeasurement';
+import { MedicalParametersProfile } from '../../domain/entities/MedicalProfile';
 import { THEME } from '../theme';
 import { GlucoseBadge } from '../components/GlucoseBadge';
 import { formatDateTime } from '../../core/utils/dateUtils';
+import { generateAndSharePdfReport } from '../../core/utils/pdfReportUtils';
 import { BigButton } from '../components/BigButton';
 
 interface HistoryScreenProps {
   measurements: BloodGlucoseMeasurement[];
+  medicalProfile?: MedicalParametersProfile | null;
   onDeleteMeasurement: (id: string) => Promise<void>;
   onUpdateMeasurement: (measurement: BloodGlucoseMeasurement) => Promise<void>;
   onNavigateToRegister: () => void;
@@ -30,11 +33,13 @@ interface HistoryScreenProps {
 
 export const HistoryScreen: React.FC<HistoryScreenProps> = ({
   measurements,
+  medicalProfile,
   onDeleteMeasurement,
   onUpdateMeasurement,
   onNavigateToRegister,
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
   const [editingItem, setEditingItem] = useState<BloodGlucoseMeasurement | null>(null);
   const [editValueStr, setEditValueStr] = useState<string>('');
   const [editNotes, setEditNotes] = useState<string>('');
@@ -93,6 +98,23 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
     setEditingItem(null);
   };
 
+  const handleGeneratePdf = async () => {
+    if (activeMeasurements.length === 0) {
+      const msg = 'Nenhuma medição registrada para gerar o relatório em PDF.';
+      Platform.OS === 'web' ? window.alert(msg) : Alert.alert('Atenção', msg);
+      return;
+    }
+    try {
+      setIsGeneratingPdf(true);
+      await generateAndSharePdfReport(activeMeasurements, medicalProfile ?? null, 'Mamãe');
+    } catch (err) {
+      const msg = 'Não foi possível gerar o relatório em PDF. Tente novamente.';
+      Platform.OS === 'web' ? window.alert(msg) : Alert.alert('Erro', msg);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
   const filterOptions = [
     { key: 'all', label: 'Todas' },
     { key: 'fasting', label: 'Jejum' },
@@ -103,6 +125,27 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
 
   return (
     <View style={styles.container}>
+      {/* Barra Superior de Ações com Botão PDF */}
+      <View style={styles.topActionBar}>
+        <View>
+          <Text style={styles.topActionTitle}>Histórico</Text>
+          <Text style={styles.topActionSubtitle}>
+            {activeMeasurements.length} {activeMeasurements.length === 1 ? 'registro' : 'registros'}
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.btnQuickPdf}
+          onPress={handleGeneratePdf}
+          disabled={isGeneratingPdf}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="document-text" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+          <Text style={styles.btnQuickPdfText}>
+            {isGeneratingPdf ? 'Gerando...' : '📄 Relatório PDF'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Barra de Filtros */}
       <View style={styles.filterBar}>
         <FlatList
@@ -271,6 +314,43 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: THEME.colors.background,
+  },
+  topActionBar: {
+    backgroundColor: THEME.colors.surface,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: THEME.spacing.md,
+    paddingTop: THEME.spacing.sm,
+    paddingBottom: THEME.spacing.xs,
+  },
+  topActionTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: THEME.colors.textPrimary,
+  },
+  topActionSubtitle: {
+    fontSize: 12,
+    color: THEME.colors.textMuted,
+    fontWeight: '500',
+  },
+  btnQuickPdf: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#DC2626',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    shadowColor: '#DC2626',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  btnQuickPdfText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
   filterBar: {
     backgroundColor: THEME.colors.surface,

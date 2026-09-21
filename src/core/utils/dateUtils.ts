@@ -86,3 +86,73 @@ export function createIsoFromTime(timeStr: string, baseDate = new Date()): strin
   }
   return d.toISOString();
 }
+
+/* ── Funções utilitárias de calendário ── */
+
+export function isSameDay(d1: Date, d2: Date): boolean {
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
+}
+
+export function isToday(date: Date): boolean {
+  return isSameDay(date, new Date());
+}
+
+export function isYesterday(date: Date): boolean {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return isSameDay(date, yesterday);
+}
+
+/**
+ * Formata a data para exibição amigável ("Hoje, 21/09", "Ontem, 20/09" ou "21/09/2026")
+ */
+export function formatDateDisplay(date: Date): string {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+
+  if (isToday(date)) return `Hoje, ${day}/${month}`;
+  if (isYesterday(date)) return `Ontem, ${day}/${month}`;
+  return `${day}/${month}/${date.getFullYear()}`;
+}
+
+/**
+ * Combina uma data selecionada no calendário com o horário digitado (HH:MM)
+ */
+export function createIsoFromDateAndTime(date: Date, timeStr: string): string {
+  const d = new Date(date);
+  const parts = timeStr.split(':');
+  const h = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+
+  if (!isNaN(h) && !isNaN(m) && h >= 0 && h <= 23 && m >= 0 && m <= 59) {
+    d.setHours(h, m, 0, 0);
+  }
+  return d.toISOString();
+}
+
+/**
+ * Número de dias no mês
+ */
+export function getDaysInMonth(year: number, month: number): number {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+/**
+ * Dia da semana do 1º dia do mês (0 = Domingo, 6 = Sábado)
+ */
+export function getFirstDayOfWeek(year: number, month: number): number {
+  return new Date(year, month, 1).getDay();
+}
+
+const MONTH_NAMES_PT = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+];
+
+export function getMonthName(month: number): string {
+  return MONTH_NAMES_PT[month] || '';
+}
