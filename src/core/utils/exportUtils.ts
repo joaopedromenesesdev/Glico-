@@ -21,12 +21,12 @@ export function generateDoctorTextReport(
   const min = Math.min(...values);
   const max = Math.max(...values);
 
-  let text = `📋 *RELATÓRIO DE GLICEMIA — GLICO+*\n`;
-  text += `👤 Paciente: ${patientName}\n`;
-  text += `📅 Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}\n`;
-  text += `🔢 Total de Medições: ${active.length}\n`;
-  text += `📊 Média Glicêmica: ${avg} mg/dL\n`;
-  text += `📉 Menor Valor: ${min} mg/dL | 📈 Maior Valor: ${max} mg/dL\n\n`;
+  let text = `*RELATÓRIO DE GLICEMIA — GLICO+*\n`;
+  text += `Paciente: ${patientName}\n`;
+  text += `Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}\n`;
+  text += `Total de Medições: ${active.length}\n`;
+  text += `Média Glicêmica: ${avg} mg/dL\n`;
+  text += `Menor Valor: ${min} mg/dL | Maior Valor: ${max} mg/dL\n\n`;
   text += `*Últimas Medições Registradas:*\n`;
 
   // Mostrar as últimas 30 medições
@@ -35,7 +35,7 @@ export function generateDoctorTextReport(
     const contextName = CONTEXT_LABELS[m.context]?.label || m.context;
     let line = `• ${formatDateTime(m.measuredAt)}: *${m.value} mg/dL* (${contextName})`;
     if (m.appliedInsulinDose && m.appliedInsulinDose > 0) {
-      line += ` 💉 ${m.appliedInsulinDose} UI`;
+      line += ` [Insulina: ${m.appliedInsulinDose} UI]`;
     }
     if (m.notes) {
       line += ` - Obs: ${m.notes}`;

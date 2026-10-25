@@ -13,9 +13,9 @@ export const THEME = {
     textMuted: '#64748B',        // Cinza neutro para detalhes secundários
     
     // Cores de marca acolhedoras (Sem tons agressivos)
-    primary: '#0D9488',          // Verde-azulado medicinal acolhedor (Teal 600)
-    primaryDark: '#0F766E',      // Teal 700
-    primaryLight: '#CCFBF1',     // Fundo suave de destaque
+    primary: '#059669',          // Verde esmeralda alinhado com a logo G+ (Emerald 600)
+    primaryDark: '#047857',      // Emerald 700
+    primaryLight: '#D1FAE5',     // Fundo suave de destaque (Emerald 100)
     
     // Cores de status clínico (Acolhedoras, sem induzir pânico)
     hypo: '#F59E0B',             // Âmbar suave para hipoglicemia (< 70)

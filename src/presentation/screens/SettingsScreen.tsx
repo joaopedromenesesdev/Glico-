@@ -148,7 +148,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     if (Platform.OS === 'web') {
       try {
         await navigator.clipboard.writeText(report);
-        window.alert('📋 Relatório copiado para a área de transferência! Cole no WhatsApp do médico.');
+        window.alert('Relatório copiado para a área de transferência! Cole no WhatsApp do médico.');
       } catch (err) {
         window.prompt('Copie o relatório abaixo:', report);
       }
@@ -223,28 +223,47 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
               <Text style={styles.statusText}>Regra Médica Ativa</Text>
             </View>
 
-            <Text style={styles.profileDetail}>
-              👨‍⚕️ <Text style={{ fontWeight: '700' }}>Médico:</Text>{' '}
-              {medicalProfile.doctorName || 'Não especificado'}
-            </Text>
-            <Text style={styles.profileDetail}>
-              📅 <Text style={{ fontWeight: '700' }}>Data da Receita:</Text>{' '}
-              {medicalProfile.prescriptionDate || 'Não informada'}
-            </Text>
-            <Text style={styles.profileDetail}>
-              ⚙️ <Text style={{ fontWeight: '700' }}>Modelo:</Text>{' '}
-              {medicalProfile.ruleConfig.type === 'sliding_scale'
-                ? 'Tabela de Escala Escalonada Fixa'
-                : 'Fórmula por Fator de Sensibilidade (ISF)'}
-            </Text>
-            <Text style={styles.profileDetail}>
-              🎯 <Text style={{ fontWeight: '700' }}>Gatilho:</Text> A partir de{' '}
-              {medicalProfile.ruleConfig.triggerThreshold} mg/dL
-            </Text>
-            <Text style={styles.profileDetail}>
-              🛡️ <Text style={{ fontWeight: '700' }}>Trava Máxima:</Text>{' '}
-              {medicalProfile.ruleConfig.maxDoseCap} UI por dose
-            </Text>
+            <View style={styles.detailRow}>
+              <Ionicons name="person-outline" size={16} color={THEME.colors.primaryDark} style={styles.detailIcon} />
+              <Text style={styles.profileDetail}>
+                <Text style={{ fontWeight: '700' }}>Médico:</Text>{' '}
+                {medicalProfile.doctorName || 'Não especificado'}
+              </Text>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Ionicons name="calendar-outline" size={16} color={THEME.colors.primaryDark} style={styles.detailIcon} />
+              <Text style={styles.profileDetail}>
+                <Text style={{ fontWeight: '700' }}>Data da Receita:</Text>{' '}
+                {medicalProfile.prescriptionDate || 'Não informada'}
+              </Text>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Ionicons name="options-outline" size={16} color={THEME.colors.primaryDark} style={styles.detailIcon} />
+              <Text style={styles.profileDetail}>
+                <Text style={{ fontWeight: '700' }}>Modelo:</Text>{' '}
+                {medicalProfile.ruleConfig.type === 'sliding_scale'
+                  ? 'Tabela de Escala Escalonada Fixa'
+                  : 'Fórmula por Fator de Sensibilidade (ISF)'}
+              </Text>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Ionicons name="locate-outline" size={16} color={THEME.colors.primaryDark} style={styles.detailIcon} />
+              <Text style={styles.profileDetail}>
+                <Text style={{ fontWeight: '700' }}>Gatilho:</Text> A partir de{' '}
+                {medicalProfile.ruleConfig.triggerThreshold} mg/dL
+              </Text>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Ionicons name="shield-checkmark-outline" size={16} color={THEME.colors.primaryDark} style={styles.detailIcon} />
+              <Text style={styles.profileDetail}>
+                <Text style={{ fontWeight: '700' }}>Trava Máxima:</Text>{' '}
+                {medicalProfile.ruleConfig.maxDoseCap} UI por dose
+              </Text>
+            </View>
 
             <View style={styles.actionsRow}>
               <TouchableOpacity
@@ -281,10 +300,12 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.btnOutline, { marginTop: 10 }]}
+              style={styles.btnRegisterPrescription}
               onPress={() => setShowConfigModal(true)}
+              activeOpacity={0.7}
             >
-              <Text style={styles.btnOutlineText}>Cadastrar Nova Prescrição</Text>
+              <Ionicons name="add-circle-outline" size={22} color={THEME.colors.primary} style={{ marginRight: 8 }} />
+              <Text style={styles.btnRegisterPrescriptionText}>Cadastrar Nova Prescrição</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -293,7 +314,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       {/* Seção de Exportação e Compartilhamento */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeader}>
-          <Ionicons name="share-social" size={24} color="#0D9488" />
+          <Ionicons name="share-social" size={24} color={THEME.colors.primary} />
           <Text style={styles.sectionTitle}>Compartilhar com o Médico</Text>
         </View>
 
@@ -309,7 +330,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         >
           <Ionicons name="document-text" size={22} color="#FFFFFF" style={{ marginRight: 8 }} />
           <Text style={styles.btnGeneratePdfText}>
-            {isGeneratingPdf ? 'Gerando Relatório PDF...' : '📄 Gerar Relatório Médico em PDF'}
+            {isGeneratingPdf ? 'Gerando Relatório PDF...' : 'Gerar Relatório Médico em PDF'}
           </Text>
         </TouchableOpacity>
 
@@ -336,14 +357,21 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           <Text style={styles.sectionTitle}>Privacidade e LGPD (Lei 13.709/18)</Text>
         </View>
 
-        <Text style={styles.privacyItem}>
-          🔒 <Text style={{ fontWeight: '700' }}>Armazenamento 100% Local:</Text> Seus dados de saúde
-          ficam salvos apenas na memória do seu smartphone. Nenhum dado é enviado para a nuvem.
-        </Text>
-        <Text style={styles.privacyItem}>
-          🚫 <Text style={{ fontWeight: '700' }}>Sem Rastreadores:</Text> Não usamos telemetria,
-          anúncios ou compartilhamento com terceiros.
-        </Text>
+        <View style={styles.privacyItemRow}>
+          <Ionicons name="lock-closed-outline" size={16} color="#0284C7" style={styles.privacyIcon} />
+          <Text style={styles.privacyItemText}>
+            <Text style={{ fontWeight: '700' }}>Armazenamento 100% Local:</Text> Seus dados de saúde
+            ficam salvos apenas na memória do seu smartphone. Nenhum dado é enviado para a nuvem.
+          </Text>
+        </View>
+
+        <View style={styles.privacyItemRow}>
+          <Ionicons name="shield-checkmark-outline" size={16} color="#0284C7" style={styles.privacyIcon} />
+          <Text style={styles.privacyItemText}>
+            <Text style={{ fontWeight: '700' }}>Sem Rastreadores:</Text> Não usamos telemetria,
+            anúncios ou compartilhamento com terceiros.
+          </Text>
+        </View>
 
         <TouchableOpacity style={styles.btnHardReset} onPress={handleHardReset}>
           <Ionicons name="trash" size={18} color="#DC2626" style={{ marginRight: 6 }} />
@@ -535,10 +563,18 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#065F46',
   },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  detailIcon: {
+    marginRight: 8,
+  },
   profileDetail: {
+    flex: 1,
     fontSize: 14,
     color: THEME.colors.textPrimary,
-    marginBottom: 6,
   },
   actionsRow: {
     flexDirection: 'row',
@@ -547,26 +583,56 @@ const styles = StyleSheet.create({
   btnOutline: {
     borderWidth: 1.5,
     borderColor: THEME.colors.primary,
-    borderRadius: 10,
-    paddingVertical: 10,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    minHeight: 48,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   btnOutlineText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
     color: THEME.colors.primary,
   },
   btnDangerOutline: {
     borderWidth: 1.5,
     borderColor: THEME.colors.danger,
-    borderRadius: 10,
-    paddingVertical: 10,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    minHeight: 48,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   btnDangerOutlineText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
     color: THEME.colors.danger,
+  },
+  btnRegisterPrescription: {
+    borderWidth: 2,
+    borderColor: THEME.colors.primary,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    minHeight: 56,
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    shadowColor: THEME.colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  btnRegisterPrescriptionText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: THEME.colors.primary,
   },
   inactiveProfileBox: {
     backgroundColor: '#FFFBEB',
@@ -592,16 +658,17 @@ const styles = StyleSheet.create({
   },
   btnPreset: {
     backgroundColor: THEME.colors.primary,
-    borderRadius: 12,
+    borderRadius: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 16,
+    minHeight: 54,
     width: '100%',
     justifyContent: 'center',
   },
   btnPresetText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
     color: '#FFFFFF',
   },
@@ -652,6 +719,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: THEME.colors.primaryDark,
+  },
+  privacyItemRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+  },
+  privacyIcon: {
+    marginRight: 8,
+    marginTop: 2,
+  },
+  privacyItemText: {
+    flex: 1,
+    fontSize: 14,
+    color: THEME.colors.textSecondary,
+    lineHeight: 20,
   },
   privacyItem: {
     fontSize: 14,

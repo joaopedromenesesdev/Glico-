@@ -113,7 +113,10 @@ export const CalendarDatePickerModal: React.FC<CalendarDatePickerModalProps> = (
         <View style={styles.container}>
           {/* Cabeçalho */}
           <View style={styles.header}>
-            <Text style={styles.title}>📅 Escolher Data</Text>
+            <View style={styles.titleRow}>
+              <Ionicons name="calendar-outline" size={22} color={THEME.colors.primary} style={{ marginRight: 8 }} />
+              <Text style={styles.title}>Escolher Data</Text>
+            </View>
             <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <Ionicons name="close" size={28} color={THEME.colors.textMuted} />
             </TouchableOpacity>
@@ -232,6 +235,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   title: {
     fontSize: 20,
     fontWeight: '800',
@@ -245,7 +252,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#99F6E4',
+    borderColor: '#A7F3D0',
     marginBottom: 16,
   },
   todayButtonText: {

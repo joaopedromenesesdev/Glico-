@@ -141,7 +141,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
         >
           <Ionicons name="document-text" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
           <Text style={styles.btnQuickPdfText}>
-            {isGeneratingPdf ? 'Gerando...' : '📄 Relatório PDF'}
+            {isGeneratingPdf ? 'Gerando...' : 'Relatório PDF'}
           </Text>
         </TouchableOpacity>
       </View>

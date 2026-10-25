@@ -40,7 +40,7 @@ export function generatePdfHtml(
       : 'Fator de Sensibilidade (ISF)';
     medicalInfo = `
       <div class="medical-box">
-        <h3>⚙️ Prescrição Médica Ativa</h3>
+        <h3>Prescrição Médica Ativa</h3>
         <p><strong>Médico(a):</strong> ${medicalProfile.doctorName || 'Não informado'}</p>
         <p><strong>Data da Receita:</strong> ${medicalProfile.prescriptionDate || 'Não informada'}</p>
         <p><strong>Modelo:</strong> ${modelo}</p>
@@ -235,7 +235,7 @@ export function generatePdfHtml(
 <body>
   <div class="header">
     <div class="header-left">
-      <h1>📋 Glico+ — Relatório de Glicemia</h1>
+      <h1>Glico+ — Relatório de Glicemia</h1>
       <h2>Paciente: ${patientName}</h2>
     </div>
     <div class="header-right">
@@ -248,7 +248,7 @@ export function generatePdfHtml(
   <div class="metrics-grid">
     <div class="metric-card">
       <div class="label">Média Glicêmica</div>
-      <div class="value" style="color:#0D9488;">${count > 0 ? avg : '--'}</div>
+      <div class="value" style="color:#059669;">${count > 0 ? avg : '--'}</div>
       <div class="sub">mg/dL</div>
     </div>
     <div class="metric-card">
@@ -270,7 +270,7 @@ export function generatePdfHtml(
 
   ${medicalInfo}
 
-  <div class="section-title">📊 Histórico de Medições${count > 50 ? ' (últimas 50)' : ''}</div>
+  <div class="section-title">Histórico de Medições${count > 50 ? ' (últimas 50)' : ''}</div>
   ${count === 0 ? '<p style="color:#94A3B8;font-style:italic;padding:20px 0;">Nenhuma medição registrada.</p>' : `
   <table>
     <thead>
@@ -291,9 +291,9 @@ export function generatePdfHtml(
 
   <div class="footer">
     <div class="footer-note">
-      🔒 <strong>Privacidade:</strong> Este relatório foi gerado localmente pelo aplicativo Glico+. Nenhum dado foi compartilhado com servidores externos.
+      <strong>Privacidade:</strong> Este relatório foi gerado localmente pelo aplicativo Glico+. Nenhum dado foi compartilhado com servidores externos.
       <br/><br/>
-      ⚠️ Os valores de HbA1c são estimativas baseadas na fórmula ADAG e não substituem exames laboratoriais.
+      <strong>Aviso Clínico:</strong> Os valores de HbA1c são estimativas baseadas na fórmula ADAG e não substituem exames laboratoriais.
     </div>
     <div class="footer-sig">
       <div class="line">Carimbo / Assinatura do Médico(a)</div>

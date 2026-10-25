@@ -100,9 +100,15 @@ export const InsulinCard: React.FC<InsulinCardProps> = ({
       {result.warnings.length > 0 && (
         <View style={styles.warningContainer}>
           {result.warnings.map((w, idx) => (
-            <Text key={idx} style={styles.warningText}>
-              ⚠️ {w}
-            </Text>
+            <View key={idx} style={styles.warningItemRow}>
+              <Ionicons
+                name="warning-outline"
+                size={16}
+                color={THEME.colors.hypoText}
+                style={{ marginRight: 6, marginTop: 2 }}
+              />
+              <Text style={styles.warningText}>{w}</Text>
+            </View>
           ))}
         </View>
       )}
@@ -212,7 +218,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF3C7',
     borderRadius: 8,
   },
+  warningItemRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginVertical: 2,
+  },
   warningText: {
+    flex: 1,
     fontSize: 13,
     color: '#92400E',
     fontWeight: '600',

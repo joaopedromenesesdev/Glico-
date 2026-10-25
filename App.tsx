@@ -125,7 +125,7 @@ export default function App() {
         <View style={styles.appHeader}>
           <View style={styles.brandRow}>
             <Image
-              source={require('./assets/G+.png')}
+              source={require('./assets/logo.png')}
               style={styles.headerLogoImage}
               resizeMode="contain"
             />

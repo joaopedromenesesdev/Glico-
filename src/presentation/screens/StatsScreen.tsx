@@ -223,6 +223,12 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ measurements }) => {
                     : styles.confidencePreliminary,
                 ]}
               >
+                <Ionicons
+                  name={hba1c.confidenceLevel === 'reliable' ? 'checkmark-circle' : 'flash'}
+                  size={14}
+                  color={hba1c.confidenceLevel === 'reliable' ? '#065F46' : '#92400E'}
+                  style={{ marginRight: 4 }}
+                />
                 <Text
                   style={[
                     styles.confidenceTagText,
@@ -232,8 +238,8 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ measurements }) => {
                   ]}
                 >
                   {hba1c.confidenceLevel === 'reliable'
-                    ? '✓ Boa Representatividade'
-                    : '⚡ Estimativa Preliminar'}
+                    ? 'Boa Representatividade'
+                    : 'Estimativa Preliminar'}
                 </Text>
               </View>
             </View>
@@ -250,7 +256,13 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ measurements }) => {
         )}
 
         <View style={styles.disclaimerContainer}>
-          <Text style={styles.disclaimerText}>⚠️ {hba1c.disclaimer}</Text>
+          <Ionicons
+            name="information-circle-outline"
+            size={16}
+            color="#D97706"
+            style={{ marginRight: 6, marginTop: 1 }}
+          />
+          <Text style={styles.disclaimerText}>{hba1c.disclaimer}</Text>
         </View>
       </View>
     </ScrollView>
@@ -447,6 +459,8 @@ const styles = StyleSheet.create({
     color: THEME.colors.textMuted,
   },
   confidenceTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -485,6 +499,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   disclaimerContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     marginTop: 10,
     padding: 10,
     backgroundColor: '#FFFBEB',
@@ -493,6 +509,7 @@ const styles = StyleSheet.create({
     borderColor: '#FDE68A',
   },
   disclaimerText: {
+    flex: 1,
     fontSize: 12,
     color: '#92400E',
     lineHeight: 18,
